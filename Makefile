@@ -9,7 +9,7 @@ all: db_test
 .PHONY: clean
 .PHONY: all
 
-db_test: db_test.o db.o
+db_test: db_test.o db.o coding.o file.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
