@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-File::File(std::string &name) :
+File::File(const std::string &name) :
 	name_(name)
 {
 	fd_ = open(name_.data(), O_RDWR | O_CREAT | O_APPEND, 0600);
@@ -19,26 +19,31 @@ File::~File()
 	close(fd_);
 }
 
-std::string File::Read(int64_t offset, size_t nbyte)
+ssize_t File::Read(const int64_t offset, size_t nbytes, char *buf)
 {
-	std::shared_ptr<char>buf(new char[nbyte+1]);
-	pread(fd_, buf.get(), nbyte, offset);
-
-	return std::string(buf.get(), nbyte);
+	return pread(fd_, buf, nbytes, offset);
 }
 
-std::string File::ReadEntry(int64_t offset)
+std::string File::Read(const int64_t offset, size_t nbytes)
 {
-	int64_t total_length = 0;
-	pread(fd_, &total_length, sizeof total_length, offset);
+	std::shared_ptr<char>buf(new char[nbytes+1]);
+	Read(offset, nbytes, buf.get());
 
-	std::shared_ptr<char>buf(new char[total_length+1]);
-	pread(fd_, buf.get(), total_length, offset+sizeof(total_length));
-
-	return std::string(buf.get(), total_length);
+	return std::string(buf.get(), nbytes);
 }
 
-int64_t File::Append(const char *buf, ssize_t count)
+// std::string File::ReadEntry(int64_t offset)
+// {
+// 	uint64_t total_length = 0;
+// 	pread(fd_, &total_length, sizeof total_length, offset);
+
+// 	std::shared_ptr<char>buf(new char[total_length+1]);
+// 	pread(fd_, buf.get(), static_cast<size_t>(total_length), offset+sizeof(total_length));
+
+// 	return std::string(buf.get(), total_length);
+// }
+
+ssize_t File::Append(const char *buf, size_t count)
 {
 	ssize_t bytes_written = 0;
 
@@ -55,7 +60,7 @@ int64_t File::Append(const char *buf, ssize_t count)
 	return offset_ += bytes_written;
 }
 
-int64_t File::Append(std::string &msg)
+ssize_t File::Append(const std::string &msg)
 {
 	return Append(msg.data(), msg.size());
 }
