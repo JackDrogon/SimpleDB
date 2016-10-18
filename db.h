@@ -1,5 +1,4 @@
-#ifndef DB_H_
-#define DB_H_
+#pragma once
 
 #include "lru.h"
 #include <string>
@@ -7,7 +6,7 @@
 
 struct KeyEntry {
 	uint32_t file_id;
-	uint64_t offset;
+	ssize_t offset;
 };
 
 class File;
@@ -16,13 +15,14 @@ class DB {
 public:
 	DB(std::string name);
 	~DB();
-	bool Put(std::string &key, std::string &value);
-	bool Get(std::string &key, std::string &value);
-	bool Delete(std::string &key);
+	bool Put(const std::string &key, const std::string &value);
+	bool Get(const std::string &key, std::string &value);
+	bool Delete(const std::string &key);
 
 private:
-	std::string EncodeKV(std::string &key, std::string &value);
-	void DecodeKV(std::string &kv, std::string &value);
+	std::string EncodeKV(const std::string &key, const std::string &value);
+	bool DecodeKV(const std::string &kv, const std::string &key, std::string &value); // TODO: use status to replace bool
+	void BuildEntryCache();
 
 	typedef LRU<std::string, std::string> Cache;
 	typedef std::unordered_map<std::string, KeyEntry> KVIndex;
@@ -32,5 +32,3 @@ private:
 	Cache cache_;
 	KVIndex kv_index_;
 };
-
-#endif // DB_H_
