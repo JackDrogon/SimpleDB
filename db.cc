@@ -16,6 +16,7 @@ DB::DB(std::string name) :
 	// TODO metrics
 	mkdir(name.c_str(), 0755);
 	write_file_ = new File(name+"/hello.1");
+	BuildEntryCache();
 }
 
 DB::~DB()
@@ -23,8 +24,23 @@ DB::~DB()
 	delete write_file_;
 }
 
-void BuildEntryCache()
+void DB::BuildEntryCache()
 {
+	ssize_t offset = 0;
+	uint64_t size;
+	std::string key;
+	for(;;) {
+		write_file_->Read(offset, sizeof(size),
+				reinterpret_cast<char *>(&size));
+		size = DecodeFixed64(reinterpret_cast<char *>(&size));
+
+		auto kv = write_file_->Read(offset+8, size);
+		if (kv.empty()) return ;
+
+		DecodeKey(kv, key);
+		kv_index_.insert(std::make_pair(key, KeyEntry{1, offset}));
+		offset = offset + 8 + size;
+	}
 }
 
 std::string DB::EncodeKV(const std::string &key, const std::string &value)
@@ -32,8 +48,9 @@ std::string DB::EncodeKV(const std::string &key, const std::string &value)
 	std::string buf;
 	uint64_t size, key_size, value_size;
 
+	// TotalLength = 8 + KeyLength + 8 + ValueLength
 	// TotalLength, KeyLength, Key, ValueLength, Value
-	EncodeFixed64(reinterpret_cast<char *>(&size), 8+8+key.size()+8+value.size());
+	EncodeFixed64(reinterpret_cast<char *>(&size), 8+key.size()+8+value.size());
 	EncodeFixed64(reinterpret_cast<char *>(&key_size), key.size());
 	EncodeFixed64(reinterpret_cast<char *>(&value_size), value.size());
 
@@ -57,6 +74,14 @@ bool DB::DecodeKV(const std::string &kv, const std::string &key, std::string &va
 	value.clear();
 	value.append(kv_data+8+key_size+8, value_size);
 	return true;
+}
+
+void DB::DecodeKey(const std::string &kv, std::string &key)
+{
+	auto kv_data = kv.data();
+	uint64_t key_size = DecodeFixed64(kv_data);
+	key.clear();
+	key.append(kv_data+8, key_size);
 }
 
 // FIXME: Crc32
@@ -89,7 +114,9 @@ bool DB::Get(const std::string &key, std::string &value)
 		size = DecodeFixed64(reinterpret_cast<char *>(&size));
 
 		auto kv = write_file_->Read(entry->second.offset+8, size);
-		return DecodeKV(kv, key, value);
+		auto result = DecodeKV(kv, key, value);
+		if (result) cache_.put(key, value);
+		return result;
 	}
 
 	return false;

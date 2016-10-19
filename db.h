@@ -22,6 +22,8 @@ public:
 private:
 	std::string EncodeKV(const std::string &key, const std::string &value);
 	bool DecodeKV(const std::string &kv, const std::string &key, std::string &value); // TODO: use status to replace bool
+	// @doc return value -> offset
+	void DecodeKey(const std::string &kv, std::string &key);
 	void BuildEntryCache();
 
 	typedef LRU<std::string, std::string> Cache;
