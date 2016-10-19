@@ -26,9 +26,11 @@ ssize_t File::Read(const int64_t offset, size_t nbytes, char *buf)
 
 std::string File::Read(const int64_t offset, size_t nbytes)
 {
+	// TODO Add status with error message
 	std::shared_ptr<char>buf(new char[nbytes+1]);
-	Read(offset, nbytes, buf.get());
+	auto bytes = Read(offset, nbytes, buf.get());
 
+	if (bytes <= 0) return std::string();
 	return std::string(buf.get(), nbytes);
 }
 
