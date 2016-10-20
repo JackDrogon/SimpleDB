@@ -127,4 +127,12 @@ bool DB::Get(const std::string &key, std::string &value)
 
 bool DB::Delete(const std::string &key)
 {
+	cache_.remove(key);
+	kv_index_.erase(key);
+
+	std::string kv(EncodeKV(key, std::string(), true));
+	auto offset = write_file_->Append(kv);
+
+	if (offset < 0) return false;
+	return true;
 }
