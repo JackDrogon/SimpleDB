@@ -21,6 +21,18 @@ public:
 	explicit LRU(unsigned int capacity) :
 		capacity_(capacity) {}
 
+	bool get(const Key &key, Value &value)
+	{
+		auto value_iter = values_.find(key);
+		if (value_iter != values_.end()) {
+			use(value_iter);
+			value = value_iter->second.first;
+			return true;
+		}
+
+		return false;
+	}
+
 	void put(const Key &key, const Value &value)
 	{
 		auto value_iter = values_.find(key);
@@ -32,16 +44,13 @@ public:
 		}
 	}
 
-	bool get(const Key &key, Value &value)
+	void remove(const Key &key)
 	{
 		auto value_iter = values_.find(key);
-		if (value_iter != values_.end()) {
-			use(value_iter);
-			value = value_iter->second.first;
-			return true;
-		}
+		if (value_iter == values_.end()) return;
 
-		return false;
+		values_.erase(value_iter);
+		keys_.erase(value_iter->second.second);
 	}
 
 	unsigned int Capacity() { return capacity_; }
