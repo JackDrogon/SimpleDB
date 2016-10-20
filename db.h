@@ -11,6 +11,9 @@ struct KeyEntry {
 
 class File;
 
+// TODO: Add mertrics
+// TODO: Add compact
+// TODO: Add table cache
 class DB {
 public:
 	DB(std::string name);
@@ -20,7 +23,8 @@ public:
 	bool Delete(const std::string &key);
 
 private:
-	std::string EncodeKV(const std::string &key, const std::string &value);
+	std::string EncodeKV(const std::string &key, const std::string &value,
+			bool deleted = false);
 	bool DecodeKV(const std::string &kv, const std::string &key, std::string &value); // TODO: use status to replace bool
 	// @doc return value -> offset
 	void DecodeKey(const std::string &kv, std::string &key);

@@ -39,18 +39,20 @@ void DB::BuildEntryCache()
 
 		DecodeKey(kv, key);
 		kv_index_.insert(std::make_pair(key, KeyEntry{1, offset}));
-		offset = offset + 8 + size;
+		offset = offset + 8 + (size >> 1);
 	}
 }
 
-std::string DB::EncodeKV(const std::string &key, const std::string &value)
+std::string DB::EncodeKV(const std::string &key, const std::string &value,
+		bool deleted)
 {
 	std::string buf;
 	uint64_t size, key_size, value_size;
 
 	// TotalLength = 8 + KeyLength + 8 + ValueLength
-	// TotalLength, KeyLength, Key, ValueLength, Value
+	// TotalLength(with deleted flag), KeyLength, Key, ValueLength, Value
 	EncodeFixed64(reinterpret_cast<char *>(&size), 8+key.size()+8+value.size());
+	size = deleted ? size << 1 : (size << 1) | 1;
 	EncodeFixed64(reinterpret_cast<char *>(&key_size), key.size());
 	EncodeFixed64(reinterpret_cast<char *>(&value_size), value.size());
 
@@ -112,12 +114,17 @@ bool DB::Get(const std::string &key, std::string &value)
 		write_file_->Read(entry->second.offset, sizeof(size),
 				reinterpret_cast<char *>(&size));
 		size = DecodeFixed64(reinterpret_cast<char *>(&size));
+		if (!(size & 1)) return false;
 
-		auto kv = write_file_->Read(entry->second.offset+8, size);
+		auto kv = write_file_->Read(entry->second.offset+8, size>>1);
 		auto result = DecodeKV(kv, key, value);
 		if (result) cache_.put(key, value);
 		return result;
 	}
 
 	return false;
+}
+
+bool DB::Delete(const std::string &key)
+{
 }
