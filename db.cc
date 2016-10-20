@@ -1,5 +1,5 @@
 #include "db.h"
-#include "file.h"
+#include "record_writer.h"
 #include "coding.h"
 
 #include <cstdlib>
@@ -15,13 +15,13 @@ DB::DB(std::string name) :
 	// TODO Add logger
 	// TODO metrics
 	mkdir(name.c_str(), 0755);
-	write_file_ = new File(name+"/hello.1");
+	record_writer_ = new RecordWriter(name+"/hello.1", 1 << 20);
 	BuildEntryCache();
 }
 
 DB::~DB()
 {
-	delete write_file_;
+	delete record_writer_;
 }
 
 void DB::BuildEntryCache()
@@ -30,11 +30,11 @@ void DB::BuildEntryCache()
 	uint64_t size;
 	std::string key;
 	for(;;) {
-		write_file_->Read(offset, sizeof(size),
+		record_writer_->Read(offset, sizeof(size),
 				reinterpret_cast<char *>(&size));
 		size = DecodeFixed64(reinterpret_cast<char *>(&size));
 
-		auto kv = write_file_->Read(offset+8, size);
+		auto kv = record_writer_->Read(offset+8, size);
 		if (kv.empty()) return ;
 
 		DecodeKey(kv, key);
@@ -92,9 +92,9 @@ bool DB::Put(const std::string &key, const std::string &value)
 {
 	cache_.put(key, value);
 
-	// fprintf(write_file_, "%lld,%ld:%s,%ld:%s\n", total_length, key.length(), key.data(), value.length(), value.data());
+	// fprintf(record_writer_, "%lld,%ld:%s,%ld:%s\n", total_length, key.length(), key.data(), value.length(), value.data());
 	std::string kv(EncodeKV(key, value)); // std::move NRVO
-	auto offset = write_file_->Append(kv);
+	auto offset = record_writer_->Append(kv);
 	if (offset < 0) return false;
 
 	kv_index_.insert(std::make_pair(key, KeyEntry{1, offset}));
@@ -106,23 +106,21 @@ bool DB::Get(const std::string &key, std::string &value)
 {
 	if (cache_.get(key, value)) {
 		return true;
-	} else {
-		auto entry = kv_index_.find(key);
-		if (entry == kv_index_.end()) return false;
-
-		uint64_t size;
-		write_file_->Read(entry->second.offset, sizeof(size),
-				reinterpret_cast<char *>(&size));
-		size = DecodeFixed64(reinterpret_cast<char *>(&size));
-		if (!(size & 1)) return false;
-
-		auto kv = write_file_->Read(entry->second.offset+8, size>>1);
-		auto result = DecodeKV(kv, key, value);
-		if (result) cache_.put(key, value);
-		return result;
 	}
 
-	return false;
+	auto entry = kv_index_.find(key);
+	if (entry == kv_index_.end()) return false;
+
+	uint64_t size;
+	record_writer_->Read(entry->second.offset, sizeof(size),
+			reinterpret_cast<char *>(&size));
+	size = DecodeFixed64(reinterpret_cast<char *>(&size));
+	if (!(size & 1)) return false;
+
+	auto kv = record_writer_->Read(entry->second.offset+8, size>>1);
+	auto result = DecodeKV(kv, key, value);
+	if (result) cache_.put(key, value);
+	return result;
 }
 
 bool DB::Delete(const std::string &key)
@@ -131,7 +129,7 @@ bool DB::Delete(const std::string &key)
 	kv_index_.erase(key);
 
 	std::string kv(EncodeKV(key, std::string(), true));
-	auto offset = write_file_->Append(kv);
+	auto offset = record_writer_->Append(kv);
 
 	if (offset < 0) return false;
 	return true;

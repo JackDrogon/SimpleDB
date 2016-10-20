@@ -34,7 +34,7 @@ private:
 	typedef std::unordered_map<std::string, KeyEntry> KVIndex;
 
 	std::string name_;
-	File *write_file_;
+	File *record_writer_;
 	Cache cache_;
 	KVIndex kv_index_;
 };

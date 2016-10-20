@@ -13,7 +13,6 @@ public:
 
 	ssize_t Read(const int64_t offset, size_t nbytes, char *buf);
 	std::string Read(const int64_t offset, size_t nbytes);
-	// std::string ReadEntry(int64_t offset);
 	ssize_t Append(const std::string &msg);
 	ssize_t Append(const char *buf, size_t bytes_written);
 
