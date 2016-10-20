@@ -1,7 +1,7 @@
 CC := clang
 CFLAGS := -Weverything -ggdb -g
 CXX := clang++
-CXXFLAGS := -Weverything -O0 -ggdb -g -std=c++11
+CXXFLAGS := -Weverything -O0 -ggdb -g -std=c++11 -Wno-c++98-compat
 LD := clang
 LDFLAGS :=
 
