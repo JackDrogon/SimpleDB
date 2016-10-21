@@ -1,5 +1,4 @@
-#ifndef LRU_H_
-#define LRU_H_
+#pragma once
 
 #include <list>
 #include <unordered_map>
@@ -8,8 +7,8 @@
 
 // TODO: Add comments
 // TODO: capicity && resize... hash_map && list malloc memery when construct
-// TODO: NoCopyable
 // TODO: Add size_type
+// TODO: Add noncopyable with ref&&
 
 template<typename Key, typename Value>
 class LRU {
@@ -109,6 +108,3 @@ std::ostream& operator << (
 	}
 	return stream;
 }
-
-
-#endif // LRU_H_
