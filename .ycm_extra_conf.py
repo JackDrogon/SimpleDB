@@ -63,9 +63,8 @@ c_flags = [
 ]
 
 cpp_flags = [
-'-Weverything',
+'-std=c++11',
 '-Wno-c++98-compat'
-'-std=c++1z',
 # '-Wc++98-compat',
 '-x',
 'c++',
