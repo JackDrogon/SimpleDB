@@ -53,6 +53,8 @@ flags = [
 './include',
 '-I',
 './lib',
+'-I',
+'src'
 ]
 
 c_flags = [
