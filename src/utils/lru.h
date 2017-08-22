@@ -6,20 +6,25 @@
 #include <iostream>
 
 // TODO: Add comments
-// TODO: capicity && resize... hash_map && list malloc memery when construct
+// TODO: hash_map && list malloc memery when construct
 // TODO: Add size_type
 // TODO: Add noncopyable with ref&&
+// TODO: std::move, double lru, lfu
+// TODO: concurrent
 
-template <typename Key, typename Value> class LRU
+template <typename Key, typename Value,
+	  typename Container = std::unordered_map<
+	      Key, std::pair<Value, typename std::list<Key>::iterator>>>
+class LRU
 {
 public:
 	using list = std::list<Key>;
-	using map =
-	    std::unordered_map<Key, std::pair<Value, typename list::iterator>>;
+	using map = Container;
 
 	explicit LRU(unsigned int capacity) : capacity_(capacity) {}
 
-	bool get(const Key &key, Value &value)
+public:
+	bool Get(const Key &key, Value &value)
 	{
 		auto value_iter = values_.find(key);
 		if (value_iter != values_.end()) {
@@ -31,7 +36,7 @@ public:
 		return false;
 	}
 
-	void put(const Key &key, const Value &value)
+	void Put(const Key &key, const Value &value)
 	{
 		auto value_iter = values_.find(key);
 		if (value_iter == values_.end()) {
@@ -42,7 +47,7 @@ public:
 		}
 	}
 
-	void remove(const Key &key)
+	void Remove(const Key &key)
 	{
 		auto value_iter = values_.find(key);
 		if (value_iter == values_.end())
@@ -53,6 +58,14 @@ public:
 	}
 
 	unsigned int Capacity() { return capacity_; }
+
+	void Resize(unsigned int capacity)
+	{
+		for (auto i = capacity_; i < capacity; ++i) {
+			evict();
+		}
+		capacity_ = capacity;
+	}
 
 private:
 	// Not copyable, not assignable.
