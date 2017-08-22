@@ -21,8 +21,6 @@ int main()
 		cout << "Not found" << endl;
 	}
 
-
-
 	db.Delete(key);
 
 	if (db.Get(key, get_value)) {

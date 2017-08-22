@@ -3,19 +3,23 @@
 #include <string>
 #include <cstdint>
 
+#include "status.h"
 #include "file.h"
 #include "log_format.h"
 
 class WritableFile;
 
-class RecordWriter : public File {
+class RecordWriter : public File
+{
 public:
 	// static std::string Next() { return to_string(file_num_+1); }
 	explicit RecordWriter(WritableFile *dest);
 	RecordWriter(const std::string &name, const ssize_t file_size);
-	~RecordWriter() { }
+	~RecordWriter() {}
+
+public:
 	std::string ReadRecord();
-	void AppendRecord();
+	void AppendRecord(const std::string &record);
 
 private:
 	const ssize_t file_size_;
@@ -32,6 +36,6 @@ private:
 				  size_t length);
 
 	// No copying allowed
-	Writer(const Writer &);
-	void operator=(const Writer &);
+	RecordWriter(const RecordWriter &);
+	void operator=(const RecordWriter &);
 };

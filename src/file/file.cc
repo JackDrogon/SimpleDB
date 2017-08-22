@@ -5,19 +5,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-File::File(const std::string &name) :
-	name_(name)
+File::File(const std::string &name) : name_(name)
 {
 	fd_ = open(name_.data(), O_RDWR | O_CREAT | O_APPEND, 0600);
-	if (fd_ < 0) abort();
+	if (fd_ < 0)
+		abort();
 
 	offset_ = lseek(fd_, 0, SEEK_END);
 }
 
-File::~File()
-{
-	close(fd_);
-}
+File::~File() { close(fd_); }
 
 ssize_t File::Read(const int64_t offset, size_t nbytes, char *buf)
 {
@@ -27,10 +24,11 @@ ssize_t File::Read(const int64_t offset, size_t nbytes, char *buf)
 std::string File::Read(const int64_t offset, size_t nbytes)
 {
 	// TODO Add status with error message
-	std::shared_ptr<char>buf(new char[nbytes+1]);
+	std::shared_ptr<char> buf(new char[nbytes + 1]);
 	auto bytes = Read(offset, nbytes, buf.get());
 
-	if (bytes <= 0) return std::string();
+	if (bytes <= 0)
+		return std::string();
 	return std::string(buf.get(), nbytes);
 }
 
@@ -40,7 +38,8 @@ std::string File::Read(const int64_t offset, size_t nbytes)
 // 	pread(fd_, &total_length, sizeof total_length, offset);
 
 // 	std::shared_ptr<char>buf(new char[total_length+1]);
-// 	pread(fd_, buf.get(), static_cast<size_t>(total_length), offset+sizeof(total_length));
+// 	pread(fd_, buf.get(), static_cast<size_t>(total_length),
+// offset+sizeof(total_length));
 
 // 	return std::string(buf.get(), total_length);
 // }

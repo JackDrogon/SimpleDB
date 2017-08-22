@@ -10,15 +10,14 @@
 // TODO: Add size_type
 // TODO: Add noncopyable with ref&&
 
-template<typename Key, typename Value>
-class LRU {
+template <typename Key, typename Value> class LRU
+{
 public:
 	using list = std::list<Key>;
-	using map = std::unordered_map<
-		Key, std::pair<Value, typename list::iterator> >;
-	
-	explicit LRU(unsigned int capacity) :
-		capacity_(capacity) {}
+	using map =
+	    std::unordered_map<Key, std::pair<Value, typename list::iterator>>;
+
+	explicit LRU(unsigned int capacity) : capacity_(capacity) {}
 
 	bool get(const Key &key, Value &value)
 	{
@@ -46,7 +45,8 @@ public:
 	void remove(const Key &key)
 	{
 		auto value_iter = values_.find(key);
-		if (value_iter == values_.end()) return;
+		if (value_iter == values_.end())
+			return;
 
 		values_.erase(value_iter);
 		keys_.erase(value_iter->second.second);
@@ -56,8 +56,8 @@ public:
 
 private:
 	// Not copyable, not assignable.
-	LRU(const LRU&);
-	LRU& operator =(const LRU&);
+	LRU(const LRU &);
+	LRU &operator=(const LRU &);
 
 	void evict()
 	{
@@ -66,7 +66,7 @@ private:
 		keys_.pop_front();
 	}
 
-	void insert(const Key& key, const Value& value)
+	void insert(const Key &key, const Value &value)
 	{
 		if (keys_.size() == capacity_) {
 			evict();
@@ -86,20 +86,16 @@ private:
 	}
 
 	// Give the operator access to our internals.
-	friend std::ostream& operator << (
-			std::ostream& stream,
-			const LRU<Key, Value>& c);
+	friend std::ostream &operator<<(std::ostream &stream,
+					const LRU<Key, Value> &c);
 
 	unsigned int capacity_;
 	list keys_;
 	map values_;
 };
 
-
 template <typename Key, typename Value>
-std::ostream& operator << (
-		std::ostream& stream,
-		const LRU<Key, Value>& c)
+std::ostream &operator<<(std::ostream &stream, const LRU<Key, Value> &c)
 {
 	for (auto i1 = c.keys.begin(); i1 != c.keys.end(); i1++) {
 		stream << *i1 << ": ";

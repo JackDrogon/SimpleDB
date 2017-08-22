@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lru.h"
+#include "utils/lru.h"
 #include <string>
 #include <unordered_map>
 
@@ -14,7 +14,8 @@ class File;
 // TODO: Add mertrics
 // TODO: Add compact
 // TODO: Add table cache
-class DB {
+class DB
+{
 public:
 	DB(std::string name);
 	~DB();
@@ -24,8 +25,9 @@ public:
 
 private:
 	std::string EncodeKV(const std::string &key, const std::string &value,
-			bool deleted = false);
-	bool DecodeKV(const std::string &kv, const std::string &key, std::string &value); // TODO: use status to replace bool
+			     bool deleted = false);
+	bool DecodeKV(const std::string &kv, const std::string &key,
+		      std::string &value); // TODO: use status to replace bool
 	// @doc return value -> offset
 	void DecodeKey(const std::string &kv, std::string &key);
 	void BuildEntryCache();

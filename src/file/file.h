@@ -6,7 +6,8 @@
 // TODO Error status
 // TODO ReadAll
 
-class File {
+class File
+{
 public:
 	File(const std::string &name);
 	~File();
@@ -16,7 +17,7 @@ public:
 	ssize_t Append(const std::string &msg);
 	ssize_t Append(const char *buf, size_t bytes_written);
 
-	std::string Name() {return name_;}
+	std::string Name() { return name_; }
 
 private:
 	const std::string name_;

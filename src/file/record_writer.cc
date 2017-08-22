@@ -1,11 +1,14 @@
 #include "record_writer.h"
 
+#include <cassert>
+#include "coding.h"
+
 RecordWriter::RecordWriter(const std::string &name, const ssize_t file_size)
-	: File(name), file_size_(file_size)
+    : File(name), file_size_(file_size)
 {
 }
 
-RecordWriter::AppendRecord(const std::string &record)
+void RecordWriter::AppendRecord(const std::string &record)
 {
 	const char *ptr = record.data();
 	size_t left = record.size();
@@ -51,8 +54,7 @@ RecordWriter::AppendRecord(const std::string &record)
 	} while (s.ok() && left > 0);
 }
 
-
-Status Writer::EmitPhysicalRecord(RecordType t, const char *ptr, size_t n)
+Status RecordWriter::EmitPhysicalRecord(RecordType t, const char *ptr, size_t n)
 {
 	assert(n <= 0xffff); // Must fit in two bytes
 	assert(block_offset_ + kHeaderSize + n <= kBlockSize);

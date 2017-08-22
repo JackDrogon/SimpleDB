@@ -1,4 +1,5 @@
 #pragma once
 
-class Status {
+class Status
+{
 };
