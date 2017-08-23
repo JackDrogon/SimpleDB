@@ -18,5 +18,4 @@ all: $(BASIC_OBJS) $(FILE_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	-$(RM) $(DB_TEST) $(DB_TEST_OBJ) $(BASIC_OBJS)
-	-$(RM) db_test
+	-$(RM) $(DB_TEST_OBJ) $(BASIC_OBJS)
