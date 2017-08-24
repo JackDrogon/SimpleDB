@@ -3,7 +3,6 @@
 #include <string>
 #include <cstdint>
 
-#include "status.h"
 #include "file.h"
 #include "log_format.h"
 
@@ -24,7 +23,7 @@ public:
 private:
 	const ssize_t file_size_;
 
-	WritableFile *dest_;
+	File *dest_;
 	int block_offset_; // Current offset in block
 
 	// crc32c values for all supported record types.  These are
@@ -32,7 +31,7 @@ private:
 	// record type stored in the header.
 	uint32_t type_crc_[kMaxRecordType + 1];
 
-	Status EmitPhysicalRecord(RecordType type, const char *ptr,
+	int EmitPhysicalRecord(RecordType type, const char *ptr,
 				  size_t length);
 
 	// No copying allowed

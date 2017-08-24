@@ -1,7 +1,9 @@
 #include "record_writer.h"
 
+#include <string>
 #include <cassert>
-#include "coding.h"
+#include "utils/coding.h"
+#include "slice.h"
 
 RecordWriter::RecordWriter(const std::string &name, const ssize_t file_size)
     : File(name), file_size_(file_size)
@@ -12,6 +14,7 @@ void RecordWriter::AppendRecord(const std::string &record)
 {
 	const char *ptr = record.data();
 	size_t left = record.size();
+	int status = 0;
 
 	bool begin = true;
 	do {
@@ -23,8 +26,7 @@ void RecordWriter::AppendRecord(const std::string &record)
 				// Fill the trailer (literal below relies on
 				// kHeaderSize being 7)
 				assert(kHeaderSize == 7);
-				dest_->Append(Slice("\x00\x00\x00\x00\x00\x00",
-						    leftover));
+				dest_->Append("\x00\x00\x00\x00\x00\x00", leftover);
 			}
 			block_offset_ = 0;
 		}
@@ -47,14 +49,14 @@ void RecordWriter::AppendRecord(const std::string &record)
 			type = kMiddleType;
 		}
 
-		s = EmitPhysicalRecord(type, ptr, fragment_length);
+		status = EmitPhysicalRecord(type, ptr, fragment_length);
 		ptr += fragment_length;
 		left -= fragment_length;
 		begin = false;
-	} while (s.ok() && left > 0);
+	} while (status && left > 0);
 }
 
-Status RecordWriter::EmitPhysicalRecord(RecordType t, const char *ptr, size_t n)
+int RecordWriter::EmitPhysicalRecord(RecordType t, const char *ptr, size_t n)
 {
 	assert(n <= 0xffff); // Must fit in two bytes
 	assert(block_offset_ + kHeaderSize + n <= kBlockSize);
@@ -66,15 +68,15 @@ Status RecordWriter::EmitPhysicalRecord(RecordType t, const char *ptr, size_t n)
 	buf[6] = static_cast<char>(t);
 
 	// Compute the crc of the record type and the payload.
-	uint32_t crc = crc32c::Extend(type_crc_[t], ptr, n);
-	crc = crc32c::Mask(crc); // Adjust for storage
-	EncodeFixed32(buf, crc);
+	// uint32_t crc = crc32c::Extend(type_crc_[t], ptr, n);
+	// crc = crc32c::Mask(crc); // Adjust for storage
+	// EncodeFixed32(buf, crc);
 
 	// Write the header and the payload
-	Status s = dest_->Append(Slice(buf, kHeaderSize));
-	if (s.ok()) {
-		s = dest_->Append(Slice(ptr, n));
-		if (s.ok()) {
+	auto s = dest_->Append(buf, kHeaderSize);
+	if (!s) {
+		s = dest_->Append(ptr, n);
+		if (!s) {
 			s = dest_->Flush();
 		}
 	}
