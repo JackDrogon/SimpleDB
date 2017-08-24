@@ -88,7 +88,7 @@ void DB::DecodeKey(const std::string &kv, std::string &key)
 // Record
 bool DB::Put(const std::string &key, const std::string &value)
 {
-	cache_.put(key, value);
+	cache_.Put(key, value);
 
 	// fprintf(record_writer_, "%lld,%ld:%s,%ld:%s\n", total_length,
 	// key.length(), key.data(), value.length(), value.data());
@@ -104,7 +104,7 @@ bool DB::Put(const std::string &key, const std::string &value)
 
 bool DB::Get(const std::string &key, std::string &value)
 {
-	if (cache_.get(key, value)) {
+	if (cache_.Get(key, value)) {
 		return true;
 	}
 
@@ -122,13 +122,13 @@ bool DB::Get(const std::string &key, std::string &value)
 	auto kv = record_writer_->Read(entry->second.offset + 8, size >> 1);
 	auto result = DecodeKV(kv, key, value);
 	if (result)
-		cache_.put(key, value);
+		cache_.Put(key, value);
 	return result;
 }
 
 bool DB::Delete(const std::string &key)
 {
-	cache_.remove(key);
+	cache_.Remove(key);
 	kv_index_.erase(key);
 
 	std::string kv(EncodeKV(key, std::string(), true));
