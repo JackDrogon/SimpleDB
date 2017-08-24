@@ -5,6 +5,7 @@
 // TODO EOF const
 // TODO Error status
 // TODO ReadAll
+// TODO std::move
 
 class File
 {
@@ -16,6 +17,7 @@ public:
 	std::string Read(const int64_t offset, size_t nbytes);
 	ssize_t Append(const std::string &msg);
 	ssize_t Append(const char *buf, size_t bytes_written);
+	int Flush();
 
 	std::string Name() { return name_; }
 
