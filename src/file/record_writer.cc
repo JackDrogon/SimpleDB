@@ -26,7 +26,8 @@ void RecordWriter::AppendRecord(const std::string &record)
 				// Fill the trailer (literal below relies on
 				// kHeaderSize being 7)
 				assert(kHeaderSize == 7);
-				dest_->Append("\x00\x00\x00\x00\x00\x00", leftover);
+				dest_->Append("\x00\x00\x00\x00\x00\x00",
+					      leftover);
 			}
 			block_offset_ = 0;
 		}

@@ -31,8 +31,7 @@ private:
 	// record type stored in the header.
 	uint32_t type_crc_[kMaxRecordType + 1];
 
-	int EmitPhysicalRecord(RecordType type, const char *ptr,
-				  size_t length);
+	int EmitPhysicalRecord(RecordType type, const char *ptr, size_t length);
 
 	// No copying allowed
 	RecordWriter(const RecordWriter &);
