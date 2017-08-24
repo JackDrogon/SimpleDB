@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/lru.h"
+#include "lru.h"
 #include <string>
 #include <unordered_map>
 
