@@ -1,5 +1,6 @@
 -include ../define.mk
 
+CXXFLAGS +=  -I../include -I.
 LIB := ../$(LIB)
 
 BASIC_OBJS := db/db.o
@@ -19,3 +20,4 @@ $(LIB): $(BASIC_OBJS) $(FILE_OBJS) $(UTILS_OBJS)
 
 clean:
 	-$(RM) $(DB_TEST_OBJ) $(BASIC_OBJS) $(UTILS_OBJS) $(LIB)
+	-$(RM) -rf ../lib
