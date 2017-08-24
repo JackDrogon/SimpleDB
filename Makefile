@@ -1,9 +1,13 @@
+-include define.mk
+
 .PHONY: clean
 .PHONY: all
 
-all: lib
 
-lib:
+
+all: $(LIB)
+
+$(LIB):
 	$(MAKE) -C src
 
 test: lib
