@@ -1,3 +1,6 @@
 *.o
 hello/
 db_test
+db_test_*
+db_full_lru_test
+db_full_lru_test_*
