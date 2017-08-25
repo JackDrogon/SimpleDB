@@ -2,8 +2,11 @@
 
 CXXFLAGS +=  -I./include
 
-TEST_OBJ := test/db_test.o
-TEST := test/db_test
+DB_TEST := test/db_test
+DB_TEST_OBJ := $(DB_TEST).o
+DB_FULLLRU_TEST := test/db_full_lru_test
+DB_FULLLRU_TEST_OBJ := $(DB_FULLLRU_TEST).o
+TEST := $(DB_TEST) $(DB_FULLLRU_TEST)
 
 .PHONY: all
 .PHONY: clean
@@ -16,7 +19,10 @@ $(LIB):
 
 test: $(TEST)
 
-$(TEST): $(LIB) $(TEST_OBJ)
+$(DB_TEST): $(LIB) $(DB_TEST_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(DB_FULLLRU_TEST): $(LIB) $(DB_FULLLRU_TEST_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
