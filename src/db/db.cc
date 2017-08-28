@@ -3,7 +3,7 @@
 #include "utils/coding.h"
 
 #include <cstdlib>
-#include <cstdint>
+#include <inttypes.h>
 #include <sys/stat.h>
 
 DB::DB(std::string name) : name_(name), cache_(1024), kv_index_()

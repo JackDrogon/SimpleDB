@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <inttypes.h>
 #include "port.h"
 
 // Lower-level versions of Put... that write directly into a character buffer

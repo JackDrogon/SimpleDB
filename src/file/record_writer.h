@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdint>
+#include <inttypes.h>
 
 #include "file.h"
 #include "log_format.h"
