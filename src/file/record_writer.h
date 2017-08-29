@@ -5,7 +5,7 @@
 #include <inttypes.h>
 
 #include "file.h"
-#include "log_format.h"
+#include "record_format.h"
 
 class WritableFile;
 
