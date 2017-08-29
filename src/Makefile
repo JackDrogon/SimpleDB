@@ -19,5 +19,5 @@ $(LIB): $(BASIC_OBJS) $(FILE_OBJS) $(UTILS_OBJS)
 	$(AR) $@ $^
 
 clean:
-	-$(RM) $(DB_TEST_OBJ) $(BASIC_OBJS) $(UTILS_OBJS) $(LIB)
+	-$(RM) $(BASIC_OBJS) $(UTILS_OBJS) $(FILE_OBJS) $(LIB)
 	-$(RM) -rf ../lib
