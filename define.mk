@@ -1,10 +1,19 @@
 CC := clang
-CFLAGS := -Weverything -ggdb -g -Wno-padded
+CFLAGS := -Weverything -Wno-padded
 CXX := clang++
-CXXFLAGS := -Weverything -O0 -ggdb -g -std=c++11 -Wno-c++98-compat -Wno-padded -I../include -I.
+CXXFLAGS := -Weverything -std=c++11 -Wno-c++98-compat -Wno-padded -I../include -I.
 LD := clang
 LDFLAGS :=
 
 AR := ar rcus
 
 LIB := lib/simpledb.a
+
+
+ifeq ($(DEBUG),yes)
+	CFLAGS   += -O0 -g -pg -ggdb3
+	CXXFLAGS += -O0 -g -pg -ggdb3
+else
+	CFLAGS   += -O3 -DNDEBUG
+	CXXFLAGS += -O3 -DNDEBUG
+endif
