@@ -1,8 +1,10 @@
 #include "file.h"
 
 #include <memory>
+
 #include <cstdlib>
 #include <fcntl.h>
+
 #include <unistd.h>
 
 File::File(const std::string &name) : name_(name)
@@ -18,7 +20,7 @@ File::~File() { close(fd_); }
 
 int File::Flush() { return 0; }
 
-ssize_t File::Read(const int64_t offset, size_t nbytes, char *buf)
+ssize_t File::Read(const off_t offset, size_t nbytes, char *buf)
 {
 	return pread(fd_, buf, nbytes, offset);
 }

@@ -15,11 +15,15 @@ public:
 	// static std::string Next() { return to_string(file_num_+1); }
 	explicit RecordWriter(WritableFile *dest);
 	RecordWriter(const std::string &name, const ssize_t file_size);
-	~RecordWriter() {}
+	~RecordWriter() = default;
+
+	// No copying allowed
+	RecordWriter(const RecordWriter &) = delete;
+	void operator=(const RecordWriter &) = delete;
 
 public:
 	std::string ReadRecord();
-	void AppendRecord(const std::string &record);
+	void Append(const std::string &record);
 
 private:
 	const ssize_t file_size_;
@@ -32,9 +36,5 @@ private:
 	// record type stored in the header.
 	uint32_t type_crc_[kMaxRecordType + 1];
 
-	int EmitPhysicalRecord(RecordType type, const char *ptr, size_t length);
-
-	// No copying allowed
-	RecordWriter(const RecordWriter &);
-	void operator=(const RecordWriter &);
+	int emitPhysicalRecord(RecordType type, const char *ptr, size_t length);
 };

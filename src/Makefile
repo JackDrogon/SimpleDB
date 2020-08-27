@@ -3,7 +3,7 @@
 CXXFLAGS +=  -I../include -I.
 LIB := ../$(LIB)
 
-BASIC_OBJS := db/db.o
+BASIC_OBJS := db/db_impl.o
 UTILS_OBJS := utils/coding.o
 FILE_OBJS := file/record_writer.o file/file.o
 

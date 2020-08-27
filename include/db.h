@@ -1,42 +1,23 @@
 #pragma once
 
-#include "lru.h"
+#include <algorithm>
 #include <string>
-#include <unordered_map>
+#include <memory>
+#include <system_error>
 
-struct KeyEntry {
-	uint32_t file_id;
-	ssize_t offset;
-};
-
-class File;
-
-// TODO: Add mertrics
-// TODO: Add compact
-// TODO: Add table cache
 class DB
 {
 public:
-	DB(std::string name);
-	~DB();
-	bool Put(const std::string &key, const std::string &value);
-	bool Get(const std::string &key, std::string &value);
-	bool Delete(const std::string &key);
+	// TODO: nocopyable but moveable
+	DB() = default;
+	virtual ~DB() = default;
 
-private:
-	std::string EncodeKV(const std::string &key, const std::string &value,
-			     bool deleted = false);
-	bool DecodeKV(const std::string &kv, const std::string &key,
-		      std::string &value); // TODO: use status to replace bool
-	// @doc return value -> offset
-	void DecodeKey(const std::string &kv, std::string &key);
-	void BuildEntryCache();
+	virtual bool Put(const std::string &key, const std::string &value) = 0;
+	virtual bool Get(const std::string &key, std::string &value) = 0;
+	virtual bool Delete(const std::string &key) = 0;
 
-	typedef LRU<std::string, std::string> Cache;
-	typedef std::unordered_map<std::string, KeyEntry> KVIndex;
-
-	std::string name_;
-	File *record_writer_;
-	Cache cache_;
-	KVIndex kv_index_;
+public:
+	static std::unique_ptr<DB> Open(std::string name);
+	static std::unique_ptr<DB> Open(std::string name,
+					std::error_code &ec) noexcept;
 };
