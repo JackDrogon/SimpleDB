@@ -11,6 +11,7 @@ TEST := $(DB_TEST) $(DB_FULLLRU_TEST)
 .PHONY: all
 .PHONY: clean
 .PHONY: test
+.PHONY: $(LIB)
 
 all: $(LIB)
 
@@ -27,4 +28,4 @@ $(DB_FULLLRU_TEST): $(LIB) $(DB_FULLLRU_TEST_OBJ)
 
 clean:
 	-$(MAKE) -C src clean
-	-$(RM) -f $(TEST) $(TEST_OBJ)
+	-$(RM) -f $(TEST) $(DB_TEST_OBJ) $(DB_FULLLRU_TEST) $(DB_FULLLRU_TEST_OBJ)
